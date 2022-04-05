@@ -102,12 +102,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
+venv
 venv.bak/
 
 # Spyder project settings
@@ -127,3 +122,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# project
+docker-compose.yml
+env/.env.dev

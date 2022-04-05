@@ -1,0 +1,55 @@
+version: "3.9"
+
+networks:
+  poprepo:
+
+services:
+
+  poprepo-api:
+    container_name: poprepo-api
+    hostname: poprepo-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      poprepo-redis:
+        condition: service_healthy
+    restart: always
+    environment:
+      - POPREPO_SETTINGS_ENV=${POPREPO_SETTINGS_ENV:-dev}
+    volumes:
+      - ./:/wrk
+    networks:
+      - poprepo
+    ports:
+      - "8000:80"
+
+  poprepo-redis:
+    image: redis
+    container_name: poprepo-redis
+    hostname: poprepo-redis
+    networks:
+      - poprepo
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    ports:
+      - "6380:6379"
+
+  poprepo-redis-commander:
+    container_name: poprepo-redis-commander
+    hostname: poprepo-redis-commander
+    image: rediscommander/redis-commander:latest
+    depends_on:
+      poprepo-redis:
+        condition: service_healthy
+    restart: always
+    environment:
+      - REDIS_HOSTS=poprepo-redis
+    networks:
+      - poprepo
+    ports:
+      - 8001:8081
