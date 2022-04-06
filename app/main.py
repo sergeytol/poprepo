@@ -44,7 +44,7 @@ async def endpoint_popularity(
         repo = g.get_repo(f"{owner}/{repo}")
     except UnknownObjectException:
         raise HTTPException(status_code=404, detail="Repository not found or is private")
-    except BadCredentialsException as exc:
+    except BadCredentialsException:
         raise HTTPException(status_code=401, detail="Invalid access token")
 
     return {"is_popular": is_popular(int(repo.stargazers_count), int(repo.forks))}
