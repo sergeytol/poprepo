@@ -7,7 +7,9 @@ name = "pypi"
 fastapi = ">=0.68.0,<0.69.0"
 pydantic = ">=1.8.0,<2.0.0"
 uvicorn = ">=0.15.0,<0.16.0"
-python-dotenv = "*"
+python-dotenv = ">=0.20.0,<0.21.0"
+PyGithub = "==1.55"
+django-environ = ">=0.8.1,<0.9"
 
 [dev-packages]
 

@@ -14,6 +14,7 @@ services:
     depends_on:
       poprepo-redis:
         condition: service_healthy
+    command: python app/main.py
     restart: always
     environment:
       - POPREPO_SETTINGS_ENV=${POPREPO_SETTINGS_ENV:-dev}
