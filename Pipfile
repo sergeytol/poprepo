@@ -12,6 +12,7 @@ PyGithub = "==1.55"
 django-environ = ">=0.8.1,<0.9"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.9"
