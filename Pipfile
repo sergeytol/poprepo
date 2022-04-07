@@ -13,6 +13,8 @@ django-environ = ">=0.8.1,<0.9"
 
 [dev-packages]
 pytest = "*"
+black = "*"
+isort = "*"
 
 [requires]
 python_version = "3.9"
