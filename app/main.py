@@ -1,3 +1,4 @@
+"""Main module"""
 from os import getenv
 from pathlib import Path
 
@@ -9,11 +10,19 @@ from github.GithubException import (BadCredentialsException,
                                     UnknownObjectException)
 from github.Repository import Repository
 
+
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 env_name = getenv("ENVIO_SETTINGS_ENV", "dev")
 env = environ.Env()
 env.read_env(ROOT_DIR / f"env/.env.{env_name}")
+
+
+class Settings:
+    """App settings"""
+    POPREPO_LOG_LEVEL = env.str("POPREPO_LOG_LEVEL", default="error")
+    POPREPO_LIVE_RELOAD = env.bool("POPREPO_LIVE_RELOAD", default=False)
+
 
 app = FastAPI()
 
@@ -66,6 +75,6 @@ if __name__ == "__main__":
         "main:app",
         host="0.0.0.0",
         port=80,
-        log_level=env.str("POPREPO_LOG_LEVEL", default="error"),
-        reload=env.bool("POPREPO_LIVE_RELOAD", default=False),
+        log_level=Settings.POPREPO_LOG_LEVEL,
+        reload=Settings.POPREPO_LIVE_RELOAD,
     )

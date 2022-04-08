@@ -4,4 +4,5 @@ uvicorn>=0.15.0,<0.16.0
 python-dotenv>=0.20.0,<0.21.0
 PyGithub==1.55
 django-environ>=0.8.1,<0.9
-pytest
+pytest==7.1.1
+
