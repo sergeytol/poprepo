@@ -17,28 +17,28 @@ def test_root():
 
 
 def test_ping():
-    response = client.get("/ping")
+    response = client.get("/v1/ping")
     assert response.status_code == 200
     assert response.json() == {"pong": True}
 
 
 def test_popularity():
-    """Test /repo/{owner}/{repo}/popularity endpoint"""
+    """Test /v1/repo/{owner}/{repo}/popularity endpoint"""
 
-    response = client.get("/repo/test//popularity")
+    response = client.get("/v1/repo/test//popularity")
     assert response.status_code == 404
     assert response.json() == {"detail": "Not Found"}
 
-    response = client.post("/repo/test/test/popularity")
+    response = client.post("/v1/repo/test/test/popularity")
     assert response.status_code == 405
     assert response.json() == {"detail": "Method Not Allowed"}
 
-    response = client.get("/repo/sergeytol/poprepo/popularity")
+    response = client.get("/v1/repo/sergeytol/poprepo/popularity")
     assert response.status_code == 400
     assert response.json() == {"detail": "Access token is required"}
 
     response = client.get(
-        "/repo/sergeytol/poprepo/popularity", headers={"GitHub-Access-Token": "test"}
+        "/v1/repo/sergeytol/poprepo/popularity", headers={"GitHub-Access-Token": "test"}
     )
     assert response.status_code == 401
     assert response.json() == {"detail": "Invalid access token"}
@@ -48,7 +48,7 @@ def test_popularity():
         mocked.side_effect = UnknownObjectException(
             mock.Mock(status=404), "not found", headers={}
         )
-        response = client.get("/repo/sergeytol/poprepo/popularity", headers=headers)
+        response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 404
         assert response.json() == {"detail": "Repository not found or is private"}
 
@@ -63,7 +63,7 @@ def test_popularity():
     mocked_inst = mocked.return_value
     mocked_inst = repo
     with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
-        response = client.get("/repo/sergeytol/poprepo/popularity", headers=headers)
+        response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
         assert response.json() == {"is_popular": False}
 
@@ -77,6 +77,6 @@ def test_popularity():
     mocked_inst = mocked.return_value
     mocked_inst = repo
     with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
-        response = client.get("/repo/sergeytol/poprepo/popularity", headers=headers)
+        response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
         assert response.json() == {"is_popular": True}

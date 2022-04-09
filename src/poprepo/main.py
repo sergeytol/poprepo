@@ -9,6 +9,7 @@ import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from github import Github
 from github.GithubException import BadCredentialsException, UnknownObjectException
+from poprepo.responses import PingResponse
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -65,16 +66,17 @@ async def add_process_time_header(request: Request, call_next):
     )
 
 
-@app.get("/ping")
-async def ping():
+@app.get("/v{api_version}/ping", response_model=PingResponse)
+async def ping(api_version):
     """
     Ping/pong for a quick health check
     """
-    return {"pong": True}
+    return PingResponse()
 
 
-@app.get("/repo/{owner}/{repo}/popularity")
+@app.get("/v{api_version}/repo/{owner}/{repo}/popularity")
 async def endpoint_popularity(
+    api_version: int,
     owner: str,
     repo: str,
     x_use_caching: Optional[str] = Header(None),
