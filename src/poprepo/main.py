@@ -8,8 +8,7 @@ import aioredis
 import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from github import Github
-from github.GithubException import (BadCredentialsException,
-                                    UnknownObjectException)
+from github.GithubException import BadCredentialsException, UnknownObjectException
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -18,18 +17,19 @@ from poprepo.service import get_repo, is_popular, make_cache_key
 from poprepo.settings import Settings
 
 
-app = FastAPI()
-
 redis_client = aioredis.from_url(
     f"redis://{Settings.POPREPO_REDIS_HOST}:{Settings.POPREPO_REDIS_PORT}"
     f"?password={Settings.POPREPO_REDIS_PASSWORD}",
-    decode_responses=True
+    decode_responses=True,
 )
+app = FastAPI()
 
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    """HTTP middleware / caching"""
+    """
+    HTTP middleware / caching
+    """
     if (
         not Settings.POPREPO_FEATURE_CACHE_ENABLED
         or request.headers.get("X-Use-Caching") != "on"
@@ -45,6 +45,7 @@ async def add_process_time_header(request: Request, call_next):
             content=json.loads(cached["body"]),
         )
 
+    # process the request
     response = await call_next(request)
 
     # save to cache
@@ -55,20 +56,20 @@ async def add_process_time_header(request: Request, call_next):
     decoded_body = response_body[0].decode()
     redis_key = make_cache_key(request.url.path)
     await redis_client.hset(
-        redis_key,
-        mapping={"status_code": response.status_code, "body": decoded_body}
+        redis_key, mapping={"status_code": response.status_code, "body": decoded_body}
     )
     await redis_client.expire(redis_key, Settings.POPREPO_FEATURE_CACHE_TTL_SEC)
 
     return JSONResponse(
-        content=json.loads(decoded_body),
-        status_code=response.status_code
+        content=json.loads(decoded_body), status_code=response.status_code
     )
 
 
 @app.get("/ping")
 async def ping():
-    """Ping/pong for a quick check"""
+    """
+    Ping/pong for a quick check
+    """
     return {"pong": True}
 
 
@@ -79,7 +80,12 @@ async def endpoint_popularity(
     x_use_caching: Optional[str] = Header(None),
     github_access_token: str = Header(None),
 ):
-    """Checking a repo popularity. It requires GitHub-Access-Token header"""
+    """
+    Checking a repo popularity.
+
+    "GitHub-Access-Token" header is required
+    "X-Use-Caching: on" header is optional
+    """
     if not github_access_token:
         raise HTTPException(status_code=400, detail="Access token is required")
 
