@@ -9,7 +9,7 @@ import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from github import Github
 from github.GithubException import BadCredentialsException, UnknownObjectException
-from poprepo.responses import PingResponse
+from poprepo.responses import PingResponse, RepoPopularityResponse
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -74,7 +74,7 @@ async def ping(api_version):
     return PingResponse()
 
 
-@app.get("/v{api_version}/repo/{owner}/{repo}/popularity")
+@app.get("/v{api_version}/repo/{owner}/{repo}/popularity", response_model=RepoPopularityResponse)
 async def endpoint_popularity(
     api_version: int,
     owner: str,
@@ -102,7 +102,7 @@ async def endpoint_popularity(
     except BadCredentialsException:
         raise HTTPException(status_code=401, detail="Invalid access token")
 
-    return {"is_popular": is_popular(repo.stargazers_count, repo.forks)}
+    return RepoPopularityResponse(is_popular=is_popular(repo.stargazers_count, repo.forks))
 
 
 if __name__ == "__main__":
