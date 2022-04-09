@@ -1,6 +1,6 @@
 import unittest
 
-from app.main import error_response, is_popular
+from poprepo.service import error_response, is_popular
 
 
 class MainTest(unittest.TestCase):

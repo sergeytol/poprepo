@@ -14,7 +14,7 @@ services:
     depends_on:
       poprepo-redis:
         condition: service_healthy
-    command: python app/main.py
+    command: python src/poprepo/main.py
     restart: always
     environment:
       - POPREPO_SETTINGS_ENV=${POPREPO_SETTINGS_ENV:-dev}
@@ -24,6 +24,23 @@ services:
       - poprepo
     ports:
       - "8000:80"
+
+  poprepo-api-test:
+    container_name: poprepo-api-test
+    hostname: poprepo-api-test
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      poprepo-redis:
+        condition: service_healthy
+    command: python -m pytest test
+    environment:
+      - POPREPO_SETTINGS_ENV=${POPREPO_SETTINGS_ENV:-test}
+    volumes:
+      - ./:/wrk
+    networks:
+      - poprepo
 
   poprepo-redis:
     image: redis

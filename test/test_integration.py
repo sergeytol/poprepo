@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from github.GithubException import UnknownObjectException
 from github.Repository import Repository
 
-from app.main import app
+from poprepo.main import app
 
 client = TestClient(app)
 headers = {"GitHub-Access-Token": "test"}
@@ -44,7 +44,7 @@ def test_popularity():
     assert response.json() == {"detail": "Invalid access token"}
 
     # repository not found or is private
-    with mock.patch("app.main.get_repo") as mocked:
+    with mock.patch("poprepo.main.get_repo") as mocked:
         mocked.side_effect = UnknownObjectException(
             mock.Mock(status=404), "not found", headers={}
         )
@@ -62,7 +62,7 @@ def test_popularity():
     )
     mocked_inst = mocked.return_value
     mocked_inst = repo
-    with mock.patch("app.main.get_repo", return_value=mocked_inst):
+    with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
         response = client.get("/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
         assert response.json() == {"is_popular": False}
@@ -76,7 +76,7 @@ def test_popularity():
     )
     mocked_inst = mocked.return_value
     mocked_inst = repo
-    with mock.patch("app.main.get_repo", return_value=mocked_inst):
+    with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
         response = client.get("/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
         assert response.json() == {"is_popular": True}
