@@ -9,7 +9,7 @@ import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from github import Github
 from github.GithubException import BadCredentialsException, UnknownObjectException
-from poprepo.responses import PingResponse, RepoPopularityResponse
+from poprepo.responses import PingResponse, RepoPopularityResponse, ErrorResponse
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -74,7 +74,15 @@ async def ping(api_version):
     return PingResponse()
 
 
-@app.get("/v{api_version}/repo/{owner}/{repo}/popularity", response_model=RepoPopularityResponse)
+@app.get(
+    "/v{api_version}/repo/{owner}/{repo}/popularity",
+    response_model=RepoPopularityResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "Access token is required"},
+        401: {"model": ErrorResponse, "description": "Invalid access token"},
+        404: {"model": ErrorResponse, "description": "Repository not found or is private"},
+    }
+)
 async def endpoint_popularity(
     api_version: int,
     owner: str,
@@ -83,7 +91,7 @@ async def endpoint_popularity(
     github_access_token: str = Header(None),
 ):
     """
-    Checking a repo popularity.
+    Checking a repo's popularity.
 
     "GitHub-Access-Token" header is required
     "X-Use-Caching: on" header is optional

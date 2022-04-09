@@ -10,3 +10,7 @@ class PingResponse(BaseModel):
 
 class RepoPopularityResponse(BaseModel):
     is_popular: bool
+
+
+class ErrorResponse(BaseModel):
+    detail: str
