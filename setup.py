@@ -22,7 +22,7 @@ setup(
         "python-dotenv>=0.20.0,<0.21.0",
         "PyGithub==1.55",
         "django-environ>=0.8.1,<0.9",
-        "redis==4.2.2",
+        "aioredis==2.0.1",
         "pytest==7.1.1",
     ],
 )

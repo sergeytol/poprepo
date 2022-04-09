@@ -4,7 +4,7 @@ Main module
 import json
 from typing import Optional
 
-import redis
+import aioredis
 import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from github import Github
@@ -20,10 +20,10 @@ from poprepo.settings import Settings
 
 app = FastAPI()
 
-redis_client = redis.Redis(
-    host=Settings.POPREPO_REDIS_HOST,
-    port=Settings.POPREPO_REDIS_PORT,
-    password=Settings.POPREPO_REDIS_PASSWORD,
+redis_client = aioredis.from_url(
+    f"redis://{Settings.POPREPO_REDIS_HOST}:{Settings.POPREPO_REDIS_PORT}"
+    f"?password={Settings.POPREPO_REDIS_PASSWORD}",
+    decode_responses=True
 )
 
 
@@ -38,31 +38,31 @@ async def add_process_time_header(request: Request, call_next):
         return response
 
     # read from cache
-    cached = redis_client.hgetall(make_cache_key(request.url.path))
-    print(cached)
+    cached = await redis_client.hgetall(make_cache_key(request.url.path))
     if cached:
-        print("it's from cache")
         return JSONResponse(
-            status_code=int(cached[b"status_code"].decode()),
-            content=json.loads(cached[b"body"].decode()),
+            status_code=int(cached["status_code"]),
+            content=json.loads(cached["body"]),
         )
 
     response = await call_next(request)
 
-    # write to cache
+    # save to cache
     if response.status_code > status.HTTP_300_MULTIPLE_CHOICES:
         return response
 
     response_body = [section async for section in response.__dict__["body_iterator"]]
     decoded_body = response_body[0].decode()
     redis_key = make_cache_key(request.url.path)
-    redis_client.hset(
-        redis_key, mapping={"status_code": response.status_code, "body": decoded_body}
+    await redis_client.hset(
+        redis_key,
+        mapping={"status_code": response.status_code, "body": decoded_body}
     )
-    redis_client.expire(redis_key, Settings.POPREPO_FEATURE_CACHE_TTL_SEC)
+    await redis_client.expire(redis_key, Settings.POPREPO_FEATURE_CACHE_TTL_SEC)
 
     return JSONResponse(
-        content=json.loads(decoded_body), status_code=response.status_code
+        content=json.loads(decoded_body),
+        status_code=response.status_code
     )
 
 
