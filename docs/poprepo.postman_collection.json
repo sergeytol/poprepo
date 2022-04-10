@@ -39,8 +39,8 @@
 						"type": "text"
 					},
 					{
-						"key": "x-use-caching",
-						"value": "on",
+						"key": "X-Use-Caching",
+						"value": "On",
 						"type": "text"
 					}
 				],
