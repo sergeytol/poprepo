@@ -56,15 +56,16 @@ async def add_process_time_header(request: Request, call_next):
         return response
 
     response_body = [section async for section in response.__dict__["body_iterator"]]
-    decoded_body = response_body[0].decode()
+    response_decoded = response_body[0].decode()
+    response_json = json.loads(response_decoded)
     redis_key = make_cache_key(request.url.path)
     await redis_client.hset(
-        redis_key, mapping={"status_code": response.status_code, "body": decoded_body}
+        redis_key, mapping={"status_code": response.status_code, "body": response_decoded}
     )
     await redis_client.expire(redis_key, Settings.POPREPO_FEATURE_CACHE_TTL_SEC)
 
     return JSONResponse(
-        content=json.loads(decoded_body), status_code=response.status_code
+        content=response_json, status_code=response.status_code
     )
 
 

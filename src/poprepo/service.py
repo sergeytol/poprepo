@@ -22,5 +22,5 @@ def get_repo(g: Github, owner: str, repo: str) -> Repository:
     return g.get_repo(f"{owner}/{repo}")
 
 
-def make_cache_key(url: str):
-    return f"cache_{hashlib.sha1(url.encode('utf-8')).hexdigest()}"
+def make_cache_key(text: str):
+    return f"cache_{hashlib.sha1(text.encode('utf-8')).hexdigest()}"
