@@ -31,11 +31,9 @@ Python packages:
         "aioredis==2.0.1",
         "pytest==7.1.1",
         
-## Usage
+## Setup
 
 All the commands are should be run in the project root directory
-
-### Setup
 
     make install
     
@@ -59,7 +57,7 @@ The API spec description will be available at `0.0.0.0:8000/docs`
     
 ## API requests examples
 
-- The API requires `GitHub-Access-Token` header for all requests
+- The API requires `GitHub-Access-Token` header for private repos
 - The API supports caching, it can be enabled by adding `X-Use-Caching:On` header to request
 
 ### Ping
@@ -68,7 +66,7 @@ The API spec description will be available at `0.0.0.0:8000/docs`
 
 ### Check repo's popularity
 
-    curl --location --request GET 'http://0.0.0.0:8000/v1/repo/PyGithub/PyGithub/popularity' \
+    curl --location --request GET 'http://0.0.0.0:8000/v1/repo/sergeytol/sm/popularity' \
     --header 'GitHub-Access-Token: test123' \
     --header 'x-use-caching: on'
 

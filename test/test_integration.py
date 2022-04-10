@@ -34,12 +34,14 @@ def test_popularity():
     assert response.status_code == 405
     assert response.json() == {"detail": "Method Not Allowed"}
 
-    response = client.get("/v1/repo/sergeytol/poprepo/popularity")
-    assert response.status_code == 400
-    assert response.json() == {"detail": "Access token is required"}
-
     response = client.get(
         "/v1/repo/sergeytol/poprepo/popularity", headers={"GitHub-Access-Token": "test"}
+    )
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Invalid access token"}
+
+    response = client.get(
+        "/v1/repo/sergeytol/sm/popularity", headers={"GitHub-Access-Token": "test"}
     )
     assert response.status_code == 401
     assert response.json() == {"detail": "Invalid access token"}

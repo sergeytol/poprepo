@@ -82,7 +82,6 @@ async def ping(api_version):
     "/v{api_version}/repo/{owner}/{repo}/popularity",
     response_model=RepoPopularityResponse,
     responses={
-        400: {"model": ErrorResponse, "description": "Access token is required"},
         401: {"model": ErrorResponse, "description": "Invalid access token"},
         404: {"model": ErrorResponse, "description": "Repository not found or is private"},
     }
