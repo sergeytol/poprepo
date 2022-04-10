@@ -31,6 +31,7 @@ async def add_process_time_header(request: Request, call_next):
     """
     HTTP middleware / caching
     """
+    github_access_token_header = request.headers.get("GitHub-Access-Token") or ""
     use_cache_caching_header = request.headers.get("X-Use-Caching")
     if (
             not Settings.POPREPO_FEATURE_CACHE_ENABLED
@@ -41,7 +42,7 @@ async def add_process_time_header(request: Request, call_next):
         return response
 
     # read from cache
-    cached = await redis_client.hgetall(make_cache_key(request.url.path))
+    cached = await redis_client.hgetall(make_cache_key(request.url.path + github_access_token_header))
     if cached:
         return JSONResponse(
             status_code=int(cached["status_code"]),
@@ -58,7 +59,7 @@ async def add_process_time_header(request: Request, call_next):
     response_body = [section async for section in response.__dict__["body_iterator"]]
     response_decoded = response_body[0].decode()
     response_json = json.loads(response_decoded)
-    redis_key = make_cache_key(request.url.path)
+    redis_key = make_cache_key(request.url.path + github_access_token_header)
     await redis_client.hset(
         redis_key, mapping={"status_code": response.status_code, "body": response_decoded}
     )
@@ -91,16 +92,16 @@ async def endpoint_popularity(
         owner: str,
         repo: str,
         x_use_caching: Optional[str] = Header(None),
-        github_access_token: str = Header(None),
+        github_access_token: Optional[str] = Header(None),
 ):
     """
     Checking a repo's popularity.
 
-    "GitHub-Access-Token" header is required
+    "GitHub-Access-Token" header is required for private repos only
     "X-Use-Caching: on" header is optional
     """
-    if not github_access_token:
-        raise HTTPException(status_code=400, detail="Access token is required")
+    # if not github_access_token:
+    #     raise HTTPException(status_code=400, detail="Access token is required")
 
     github_api = Github(github_access_token)
 
