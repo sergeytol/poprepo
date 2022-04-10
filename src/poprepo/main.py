@@ -31,9 +31,11 @@ async def add_process_time_header(request: Request, call_next):
     """
     HTTP middleware / caching
     """
+    use_cache_caching_header = request.headers.get("X-Use-Caching")
     if (
-        not Settings.POPREPO_FEATURE_CACHE_ENABLED
-        or request.headers.get("X-Use-Caching") != "on"
+            not Settings.POPREPO_FEATURE_CACHE_ENABLED
+            or use_cache_caching_header is None
+            or use_cache_caching_header.lower() != "on"
     ):
         response = await call_next(request)
         return response
@@ -84,11 +86,11 @@ async def ping(api_version):
     }
 )
 async def endpoint_popularity(
-    api_version: int,
-    owner: str,
-    repo: str,
-    x_use_caching: Optional[str] = Header(None),
-    github_access_token: str = Header(None),
+        api_version: int,
+        owner: str,
+        repo: str,
+        x_use_caching: Optional[str] = Header(None),
+        github_access_token: str = Header(None),
 ):
     """
     Checking a repo's popularity.

@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "cfaa06ed-b2cc-4e93-ad0d-0bc7445a30cc",
+		"name": "poprepo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://0.0.0.0:8000/v1/ping",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8000",
+					"path": [
+						"v1",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /repo/{owner}/{repo}/popularity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "GitHub-Access-Token",
+						"value": "test123",
+						"type": "text"
+					},
+					{
+						"key": "x-use-caching",
+						"value": "on",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://0.0.0.0:8000/v1/repo/PyGithub/PyGithub/popularity",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8000",
+					"path": [
+						"v1",
+						"repo",
+						"PyGithub",
+						"PyGithub",
+						"popularity"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

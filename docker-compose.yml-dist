@@ -24,6 +24,10 @@ services:
       - poprepo
     ports:
       - "8000:80"
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:8000/v1/ping" ]
+      interval: 15s
+      retries: 30
 
   poprepo-api-test:
     container_name: poprepo-api-test
