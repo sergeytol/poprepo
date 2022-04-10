@@ -14,7 +14,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from poprepo.service import get_repo, is_popular, make_cache_key
+from poprepo.service import get_repo, is_popular, make_cache_key, calc_score
 from poprepo.settings import Settings
 
 
@@ -112,7 +112,18 @@ async def endpoint_popularity(
     except BadCredentialsException:
         raise HTTPException(status_code=401, detail="Invalid access token")
 
-    return RepoPopularityResponse(is_popular=is_popular(repo.stargazers_count, repo.forks))
+    score = calc_score(repo.stargazers_count, repo.forks)
+
+    return RepoPopularityResponse(
+        is_popular=is_popular(score),
+        score=score,
+        stargazers_count=repo.stargazers_count,
+        forks=repo.forks,
+        private=repo.private,
+        created_at=repo.created_at,
+        updated_at=repo.updated_at,
+        pushed_at=repo.pushed_at,
+    )
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -58,25 +59,43 @@ def test_popularity():
         requester=MagicMock(),
         headers=MagicMock(),
         completed=MagicMock(),
-        attributes={"stargazers_count": 499, "forks": 0},
+        attributes={
+            "stargazers_count": 499,
+            "forks": 0,
+            "private": False,
+            "created_at": "2013-05-01T17:12:17Z",
+            "updated_at": "2013-05-01T17:12:17Z",
+            "pushed_at": "2013-05-01T17:12:17Z",
+        },
     )
     mocked_inst = mocked.return_value
     mocked_inst = repo
     with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
         response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
-        assert response.json() == {"is_popular": False}
+        assert response.json() == {"is_popular": False, "score": 499, "stargazers_count": 499, "forks": 0,
+                                   "private": False, "created_at": "2013-05-01T17:12:17",
+                                   "updated_at": "2013-05-01T17:12:17", "pushed_at": "2013-05-01T17:12:17"}
 
     # popular
     repo = Repository(
         requester=MagicMock(),
         headers=MagicMock(),
         completed=MagicMock(),
-        attributes={"stargazers_count": 0, "forks": 250},
+        attributes={
+            "stargazers_count": 0,
+            "forks": 250,
+            "private": True,
+            "created_at": "2013-05-01T17:12:17Z",
+            "updated_at": "2013-05-01T17:12:17Z",
+            "pushed_at": "2013-05-01T17:12:17Z",
+        },
     )
     mocked_inst = mocked.return_value
     mocked_inst = repo
     with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
         response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
-        assert response.json() == {"is_popular": True}
+        assert response.json() == {"is_popular": True, "score": 500, "stargazers_count": 0, "forks": 250,
+                                   "private": True, "created_at": "2013-05-01T17:12:17",
+                                   "updated_at": "2013-05-01T17:12:17", "pushed_at": "2013-05-01T17:12:17"}

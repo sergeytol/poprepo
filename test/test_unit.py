@@ -1,44 +1,45 @@
 import unittest
 
-from poprepo.service import error_response, is_popular
+from poprepo.service import is_popular, calc_score
 
 
 class MainTest(unittest.TestCase):
     """"""
-
-    def test_error_response(self):
+    def test_calc_score(self):
         try:
-            error_response()
+            calc_score()
         except TypeError as exc:
             assert (
-                str(exc)
-                == "error_response() missing 1 required positional argument: 'message'"
-            )
-
-        result = error_response(message="test")
-        assert isinstance(result, dict)
-        assert "detail" in result
-        assert result["detail"] == "test"
-
-    def test_error_response(self):
-        try:
-            is_popular()
-        except TypeError as exc:
-            assert (
-                str(exc) == "is_popular() missing 2 required positional arguments: "
+                str(exc) == "calc_score() missing 2 required positional arguments: "
                 "'stargazers_count' and 'forks_count'"
             )
 
         try:
-            is_popular(500, "1")
+            calc_score(500, "1")
         except TypeError as exc:
             assert str(exc) == "unsupported operand type(s) for +: 'int' and 'str'"
 
         try:
-            is_popular("500", 1)
+            calc_score("500", 1)
         except TypeError as exc:
             assert str(exc) == 'can only concatenate str (not "int") to str'
 
-        result = is_popular(500, 1)
+        result = calc_score(500, 1)
+        assert isinstance(result, int)
+        assert result == 502
+
+    def test_is_popular(self):
+        try:
+            is_popular()
+        except TypeError as exc:
+            assert (
+                str(exc) == "is_popular() missing 1 required positional argument: 'score'"
+            )
+
+        result = is_popular(499)
+        assert isinstance(result, bool)
+        assert result is False
+
+        result = is_popular(500)
         assert isinstance(result, bool)
         assert result is True

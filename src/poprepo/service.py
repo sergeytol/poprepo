@@ -7,14 +7,14 @@ from github import Github
 from github.Repository import Repository
 
 
-def error_response(message: str):
-    """Wrapper for error responses"""
-    return {"detail": message}
-
-
-def is_popular(stargazers_count: int, forks_count: int) -> bool:
+def calc_score(stargazers_count: int, forks_count: int) -> int:
     """Check repo popularity"""
-    return (stargazers_count + (forks_count * 2)) >= 500
+    return (stargazers_count + (forks_count * 2))
+
+
+def is_popular(score: int) -> bool:
+    """Check repo popularity"""
+    return score >= 500
 
 
 def get_repo(g: Github, owner: str, repo: str) -> Repository:
