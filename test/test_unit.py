@@ -1,10 +1,11 @@
 import unittest
 
-from poprepo.service import is_popular, calc_score
+from poprepo.service import calc_score, is_popular
 
 
 class MainTest(unittest.TestCase):
     """"""
+
     def test_calc_score(self):
         try:
             calc_score()
@@ -33,7 +34,8 @@ class MainTest(unittest.TestCase):
             is_popular()
         except TypeError as exc:
             assert (
-                str(exc) == "is_popular() missing 1 required positional argument: 'score'"
+                str(exc)
+                == "is_popular() missing 1 required positional argument: 'score'"
             )
 
         result = is_popular(499)

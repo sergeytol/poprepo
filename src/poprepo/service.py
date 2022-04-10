@@ -9,7 +9,7 @@ from github.Repository import Repository
 
 def calc_score(stargazers_count: int, forks_count: int) -> int:
     """Check repo popularity"""
-    return (stargazers_count + (forks_count * 2))
+    return stargazers_count + (forks_count * 2)
 
 
 def is_popular(score: int) -> bool:

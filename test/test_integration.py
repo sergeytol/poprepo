@@ -75,9 +75,16 @@ def test_popularity():
     with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
         response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
-        assert response.json() == {"is_popular": False, "score": 499, "stargazers_count": 499, "forks": 0,
-                                   "private": False, "created_at": "2013-05-01T17:12:17",
-                                   "updated_at": "2013-05-01T17:12:17", "pushed_at": "2013-05-01T17:12:17"}
+        assert response.json() == {
+            "is_popular": False,
+            "score": 499,
+            "stargazers_count": 499,
+            "forks": 0,
+            "private": False,
+            "created_at": "2013-05-01T17:12:17",
+            "updated_at": "2013-05-01T17:12:17",
+            "pushed_at": "2013-05-01T17:12:17",
+        }
 
     # popular
     repo = Repository(
@@ -98,6 +105,13 @@ def test_popularity():
     with mock.patch("poprepo.main.get_repo", return_value=mocked_inst):
         response = client.get("/v1/repo/sergeytol/poprepo/popularity", headers=headers)
         assert response.status_code == 200
-        assert response.json() == {"is_popular": True, "score": 500, "stargazers_count": 0, "forks": 250,
-                                   "private": True, "created_at": "2013-05-01T17:12:17",
-                                   "updated_at": "2013-05-01T17:12:17", "pushed_at": "2013-05-01T17:12:17"}
+        assert response.json() == {
+            "is_popular": True,
+            "score": 500,
+            "stargazers_count": 0,
+            "forks": 250,
+            "private": True,
+            "created_at": "2013-05-01T17:12:17",
+            "updated_at": "2013-05-01T17:12:17",
+            "pushed_at": "2013-05-01T17:12:17",
+        }

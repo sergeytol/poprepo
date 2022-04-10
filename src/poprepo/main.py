@@ -8,15 +8,16 @@ import aioredis
 import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from github import Github
-from github.GithubException import BadCredentialsException, UnknownObjectException
-from poprepo.responses import PingResponse, RepoPopularityResponse, ErrorResponse
+from github.GithubException import (BadCredentialsException,
+                                    UnknownObjectException)
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from poprepo.service import get_repo, is_popular, make_cache_key, calc_score
+from poprepo.responses import (ErrorResponse, PingResponse,
+                               RepoPopularityResponse)
+from poprepo.service import calc_score, get_repo, is_popular, make_cache_key
 from poprepo.settings import Settings
-
 
 redis_client = aioredis.from_url(
     f"redis://{Settings.POPREPO_REDIS_HOST}:{Settings.POPREPO_REDIS_PORT}"
@@ -34,15 +35,17 @@ async def add_process_time_header(request: Request, call_next):
     github_access_token_header = request.headers.get("GitHub-Access-Token") or ""
     use_cache_caching_header = request.headers.get("X-Use-Caching")
     if (
-            not Settings.POPREPO_FEATURE_CACHE_ENABLED
-            or use_cache_caching_header is None
-            or use_cache_caching_header.lower() != "on"
+        not Settings.POPREPO_FEATURE_CACHE_ENABLED
+        or use_cache_caching_header is None
+        or use_cache_caching_header.lower() != "on"
     ):
         response = await call_next(request)
         return response
 
     # read from cache
-    cached = await redis_client.hgetall(make_cache_key(request.url.path + github_access_token_header))
+    cached = await redis_client.hgetall(
+        make_cache_key(request.url.path + github_access_token_header)
+    )
     if cached:
         return JSONResponse(
             status_code=int(cached["status_code"]),
@@ -61,13 +64,12 @@ async def add_process_time_header(request: Request, call_next):
     response_json = json.loads(response_decoded)
     redis_key = make_cache_key(request.url.path + github_access_token_header)
     await redis_client.hset(
-        redis_key, mapping={"status_code": response.status_code, "body": response_decoded}
+        redis_key,
+        mapping={"status_code": response.status_code, "body": response_decoded},
     )
     await redis_client.expire(redis_key, Settings.POPREPO_FEATURE_CACHE_TTL_SEC)
 
-    return JSONResponse(
-        content=response_json, status_code=response.status_code
-    )
+    return JSONResponse(content=response_json, status_code=response.status_code)
 
 
 @app.get("/v{api_version}/ping", response_model=PingResponse)
@@ -83,15 +85,18 @@ async def ping(api_version):
     response_model=RepoPopularityResponse,
     responses={
         401: {"model": ErrorResponse, "description": "Invalid access token"},
-        404: {"model": ErrorResponse, "description": "Repository not found or is private"},
-    }
+        404: {
+            "model": ErrorResponse,
+            "description": "Repository not found or is private",
+        },
+    },
 )
 async def endpoint_popularity(
-        api_version: int,
-        owner: str,
-        repo: str,
-        x_use_caching: Optional[str] = Header(None),
-        github_access_token: Optional[str] = Header(None),
+    api_version: int,
+    owner: str,
+    repo: str,
+    x_use_caching: Optional[str] = Header(None),
+    github_access_token: Optional[str] = Header(None),
 ):
     """
     Checking a repo's popularity.
